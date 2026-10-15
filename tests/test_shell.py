@@ -22,19 +22,32 @@ class ShellTests(unittest.TestCase):
         self.assertEqual(self.shell.vfs_name, "test_vfs")
 
     def test_ls_without_args(self):
-        """ls без аргументов печатает пустой список."""
+        """ls без аргументов сообщает, что аргументов нет."""
         self.assertEqual(self.shell.execute("ls"),
-                         [Message("ls: аргументы []")])
+                         [Message("ls: заглушка, аргументов нет")])
 
     def test_ls_with_args_and_env(self):
         """ls печатает аргументы после раскрытия переменных."""
-        self.assertEqual(self.shell.execute("ls -l $HOME"),
-                         [Message("ls: аргументы ['-l', '/home/user']")])
+        self.assertEqual(self.shell.execute("ls -l $HOME"), [
+            Message("ls: заглушка, аргументов: 2"),
+            Message('  1) "-l"'),
+            Message('  2) "/home/user"'),
+        ])
+
+    def test_ls_space_and_empty_args(self):
+        """Аргумент с пробелом и пустой аргумент видны в кавычках."""
+        self.assertEqual(self.shell.execute('ls "my dir" ""'), [
+            Message("ls: заглушка, аргументов: 2"),
+            Message('  1) "my dir"'),
+            Message('  2) ""'),
+        ])
 
     def test_cd_with_arg(self):
         """cd печатает свой аргумент."""
-        self.assertEqual(self.shell.execute("cd /tmp"),
-                         [Message("cd: аргументы ['/tmp']")])
+        self.assertEqual(self.shell.execute("cd /tmp"), [
+            Message("cd: заглушка, аргументов: 1"),
+            Message('  1) "/tmp"'),
+        ])
 
     def test_cd_too_many_args(self):
         """cd с двумя аргументами — ошибка."""

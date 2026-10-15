@@ -52,12 +52,18 @@ python src/main.py [имя_VFS]
 ## Примеры
 
 ```
+$ ls
+ls: заглушка, аргументов нет
 $ ls -l $HOME
-ls: аргументы ['-l', '/home/user']
+ls: заглушка, аргументов: 2
+  1) "-l"
+  2) "/home/user"
 $ cd "$HOME/my dir"
-cd: аргументы ['/home/user/my dir']
+cd: заглушка, аргументов: 1
+  1) "/home/user/my dir"
 $ ls '$HOME'
-ls: аргументы ['$HOME']
+ls: заглушка, аргументов: 1
+  1) "$HOME"
 $ foo
 foo: команда не найдена
 $ ls "abc

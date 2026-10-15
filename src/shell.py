@@ -17,6 +17,20 @@ class Message:
     is_error: bool = False
 
 
+def stub_output(name, args):
+    """Вывод команды-заглушки: имя команды и каждый её аргумент.
+
+    Каждый аргумент печатается отдельной строкой в кавычках, чтобы
+    были видны пробелы внутри аргумента и пустые аргументы.
+    """
+    if not args:
+        return [Message(f"{name}: заглушка, аргументов нет")]
+    lines = [Message(f"{name}: заглушка, аргументов: {len(args)}")]
+    for number, arg in enumerate(args, start=1):
+        lines.append(Message(f'  {number}) "{arg}"'))
+    return lines
+
+
 class Shell:
     """Оболочка: хранит состояние и выполняет введённые строки."""
 
@@ -47,13 +61,13 @@ class Shell:
 
     def cmd_ls(self, args):
         """Заглушка ls: печатает имя команды и аргументы."""
-        return [Message(f"ls: аргументы {args}")]
+        return stub_output("ls", args)
 
     def cmd_cd(self, args):
         """Заглушка cd: печатает имя команды и аргументы."""
         if len(args) > MAX_CD_ARGS:
             return [Message("cd: слишком много аргументов", True)]
-        return [Message(f"cd: аргументы {args}")]
+        return stub_output("cd", args)
 
     def cmd_exit(self, args):
         """Команда exit [код]: завершает работу оболочки."""
