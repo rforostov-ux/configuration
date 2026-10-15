@@ -1,3 +1,9 @@
+"""Логика оболочки: разбор строки и выполнение команд.
+
+Модуль ничего не знает про окно. Результат команды возвращается
+списком сообщений, а показывает их уже модуль gui.
+"""
+
 import getpass
 import socket
 from dataclasses import dataclass
@@ -11,10 +17,15 @@ DEFAULT_EXIT_CODE = 0
 
 @dataclass
 class Message:
-    """Строка вывода: текст и признак ошибки"""
+    """Строка вывода: текст и признак ошибки (как struct в C++)."""
 
     text: str
     is_error: bool = False
+
+
+def has_error(messages):
+    """Проверяет, есть ли среди сообщений хотя бы одна ошибка."""
+    return any(message.is_error for message in messages)
 
 
 def stub_output(name, args):

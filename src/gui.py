@@ -1,3 +1,9 @@
+"""Графический интерфейс: окно в виде терминала.
+
+Окно не выполняет команды само: оно передаёт строку в Shell
+и показывает полученные сообщения.
+"""
+
 import tkinter as tk
 
 WINDOW_SIZE = "800x500"
@@ -13,8 +19,8 @@ BUTTON_TEXT = "Выполнить"
 class ShellWindow:
     """Окно эмулятора: поле вывода сверху, ввод и кнопка снизу."""
 
-    def __init__(self, root, shell):
-        """Создаёт элементы окна и привязывает их к оболочке."""
+    def __init__(self, root, shell, startup=()):
+        """Создаёт окно и показывает стартовые сообщения."""
         self.root = root
         self.shell = shell
         root.title(f"Эмулятор оболочки — VFS: {shell.vfs_name}")
@@ -22,6 +28,7 @@ class ShellWindow:
         self.output = self._create_output()
         self.entry = self._create_input_row()
         self.print_line("Эмулятор оболочки. Для выхода введите exit.")
+        self.print_messages(startup)
 
     def _create_output(self):
         """Создаёт поле вывода, доступное только для чтения."""
@@ -57,6 +64,12 @@ class ShellWindow:
         self.output.config(state="disabled")
         self.output.see(tk.END)
 
+    def print_messages(self, messages):
+        """Печатает сообщения оболочки; ошибки выделяются цветом."""
+        for message in messages:
+            tag = ERROR_TAG if message.is_error else NORMAL_TAG
+            self.print_line(message.text, tag)
+
     def on_enter(self, _event):
         """Обработчик Enter: выполняет введённую строку."""
         self.run_entered()
@@ -69,17 +82,21 @@ class ShellWindow:
         line = self.entry.get()
         self.entry.delete(0, tk.END)
         self.print_line(self.shell.prompt + line)
-        for message in self.shell.execute(line):
-            tag = ERROR_TAG if message.is_error else NORMAL_TAG
-            self.print_line(message.text, tag)
+        self.print_messages(self.shell.execute(line))
         if self.shell.exit_code is not None:
             self.root.destroy()
             return
         self.entry.focus()
 
 
-def run(shell):
-    """Создаёт окно и запускает цикл обработки событий."""
+def run(shell, startup=()):
+    """Создаёт окно, показывает стартовые сообщения, запускает цикл.
+
+    Если стартовый скрипт уже выполнил exit, окно сразу закрывается.
+    """
     root = tk.Tk()
-    ShellWindow(root, shell)
-    root.mainloop()
+    ShellWindow(root, shell, startup)
+    if shell.exit_code is None:
+        root.mainloop()
+    else:
+        root.destroy()

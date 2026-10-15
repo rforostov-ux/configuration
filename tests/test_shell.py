@@ -4,7 +4,7 @@ import os
 import unittest
 from unittest import mock
 
-from shell import Message, Shell
+from shell import Message, Shell, has_error
 
 TEST_ENV = {"HOME": "/home/user", "USER": "user"}
 
@@ -90,6 +90,16 @@ class ShellTests(unittest.TestCase):
         result = self.shell.execute("exit 1 2")
         self.assertTrue(result[0].is_error)
         self.assertIsNone(self.shell.exit_code)
+
+    def test_has_error_true(self):
+        """has_error находит ошибку среди сообщений."""
+        messages = [Message("ok"), Message("bad", True)]
+        self.assertTrue(has_error(messages))
+
+    def test_has_error_false(self):
+        """has_error ложно, если все сообщения обычные."""
+        self.assertFalse(has_error([Message("ok")]))
+        self.assertFalse(has_error([]))
 
 
 if __name__ == "__main__":

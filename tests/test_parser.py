@@ -80,6 +80,30 @@ class ParseTests(unittest.TestCase):
         with self.assertRaises(ParseError):
             parse("ls ${1x}")
 
+    def test_full_line_comment(self):
+        """Строка-комментарий даёт пустой список."""
+        self.assertEqual(parse("# просто заметка"), [])
+
+    def test_comment_after_command(self):
+        """Комментарий после команды отбрасывается."""
+        self.assertEqual(parse("ls -l # список"), ["ls", "-l"])
+
+    def test_hash_inside_word(self):
+        """'#' внутри слова — обычный символ."""
+        self.assertEqual(parse("ls a#b"), ["ls", "a#b"])
+
+    def test_hash_in_quotes(self):
+        """'#' в кавычках — обычный символ."""
+        self.assertEqual(parse("ls '#x' \"#y\""), ["ls", "#x", "#y"])
+
+    def test_comment_may_contain_quote(self):
+        """Незакрытая кавычка внутри комментария не ошибка."""
+        self.assertEqual(parse("ls # it's"), ["ls"])
+
+    def test_hash_after_empty_quotes(self):
+        """'#' сразу после пустых кавычек остаётся частью слова."""
+        self.assertEqual(parse('ls ""#x'), ["ls", "#x"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,13 +1,15 @@
 """Парсер командной строки: строка -> список слов.
 
 Раскрывает переменные окружения реальной ОС ($HOME, ${HOME}) и
-учитывает 'одинарные' и "двойные" кавычки.
+учитывает 'одинарные' и "двойные" кавычки. Неэкранированный
+'#' в начале слова начинает комментарий до конца строки.
 """
 
 import os
 
 NOT_FOUND = -1
 SPACES = " \t"
+COMMENT = "#"
 SINGLE_QUOTE = "'"
 DOUBLE_QUOTE = '"'
 DOLLAR = "$"
@@ -102,11 +104,28 @@ def read_fragment(line, pos):
     return char, pos + 1
 
 
+def is_comment_start(char, current):
+    """Проверяет, начинается ли комментарий: '#' в начале слова."""
+    return char == COMMENT and current is None
+
+
+def append_fragment(current, text, char):
+    """Добавляет фрагмент к текущему слову и возвращает слово.
+
+    Пустой фрагмент слова не начинает, кроме пустых кавычек: так
+    "" даёт пустой аргумент, а неопределённая $VAR — ничего.
+    """
+    if text or char in QUOTES:
+        return (current or "") + text
+    return current
+
+
 def parse(line):
     """Разбивает строку на слова с учётом кавычек и переменных.
 
     Пробелы вне кавычек разделяют слова. Пустое слово получается
     только из пустых кавычек: "" даёт [""], а $НЕТ_ТАКОЙ даёт [].
+    Комментарий ('#' в начале слова) отбрасывается до конца строки.
     Бросает ParseError, если строка составлена неверно.
     """
     words = []
@@ -114,6 +133,8 @@ def parse(line):
     pos = 0
     while pos < len(line):
         char = line[pos]
+        if is_comment_start(char, current):
+            break
         if char in SPACES:
             if current is not None:
                 words.append(current)
@@ -121,8 +142,7 @@ def parse(line):
             pos += 1
             continue
         text, pos = read_fragment(line, pos)
-        if text or char in QUOTES:
-            current = (current or "") + text
+        current = append_fragment(current, text, char)
     if current is not None:
         words.append(current)
     return words
