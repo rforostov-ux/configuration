@@ -9,9 +9,15 @@ from config import Config
 from script import ScriptError, read_script, run_script
 from shell import Message, Shell
 from startup import build_startup
-from vfs import empty_vfs
+from vfs import Vfs, VfsDir, VfsFile
 
 TEST_ENV = {"HOME": "/home/user"}
+
+
+def small_vfs():
+    """VFS для тестов: каталог /tmp с одним файлом a.txt."""
+    tmp = VfsDir("tmp", {"a.txt": VfsFile("a.txt", b"x")})
+    return Vfs("test_vfs", VfsDir("", {"tmp": tmp}))
 
 
 def texts(messages):
@@ -26,7 +32,7 @@ class ScriptTestCase(unittest.TestCase):
         """Создаёт временную папку и оболочку."""
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.shell = Shell(empty_vfs("test_vfs"))
+        self.shell = Shell(small_vfs())
 
     def write_script(self, content, encoding="utf-8"):
         """Записывает скрипт во временную папку и возвращает путь."""
@@ -42,20 +48,18 @@ class RunScriptTests(ScriptTestCase):
 
     def test_shows_input_and_output(self):
         """В диалоге есть и введённая команда, и её вывод."""
-        path = self.write_script("ls -l $HOME\n")
+        path = self.write_script("ls $NOPE/tmp\n")
         result = run_script(self.shell, path)
         self.assertEqual(result, [
-            Message(self.shell.prompt + "ls -l $HOME"),
-            Message("ls: заглушка, аргументов: 2"),
-            Message('  1) "-l"'),
-            Message('  2) "/home/user"'),
+            Message(self.shell.prompt + "ls $NOPE/tmp"),
+            Message("a.txt"),
         ])
 
     def test_blank_lines_are_skipped(self):
         """Пустые строки не попадают в диалог."""
         path = self.write_script("\nls\n   \ncd /tmp\n")
         result = run_script(self.shell, path)
-        self.assertEqual(len(result), 5)
+        self.assertEqual(len(result), 3)
 
     def test_comment_is_shown_without_output(self):
         """Комментарий показывается как ввод, но вывода не даёт."""
@@ -120,8 +124,8 @@ class RunScriptTests(ScriptTestCase):
         """Строки с переводом CRLF (Windows) читаются правильно."""
         path = self.write_script("ls\r\ncd /tmp\r\n")
         result = run_script(self.shell, path)
-        self.assertEqual(texts(result)[1], "ls: заглушка, аргументов нет")
-        self.assertEqual(texts(result)[4], '  1) "/tmp"')
+        self.assertEqual(texts(result)[1], "tmp/")
+        self.assertEqual(self.shell.cwd, "/tmp")
 
     def test_utf8_bom(self):
         """Метка BOM в начале файла (Блокнот Windows) не мешает."""
@@ -174,7 +178,7 @@ class BuildStartupTests(ScriptTestCase):
         path = self.write_script("ls\n")
         result = build_startup(Config(None, path), self.shell)
         self.assertTrue(result[0].text.startswith("[debug]"))
-        self.assertEqual(result[-1], Message("ls: заглушка, аргументов нет"))
+        self.assertEqual(result[-1], Message("tmp/"))
 
     def test_script_error_reaches_startup(self):
         """Ошибка скрипта попадает в стартовые сообщения."""

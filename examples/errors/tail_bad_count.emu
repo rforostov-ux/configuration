@@ -1,0 +1,4 @@
+# Ошибка: неверное N у tail -n. Запуск с --vfs examples/vfs/deep.xml.
+# Скрипт останавливается на строке с ошибкой.
+tail -n 2 /readme.txt
+tail -n abc /readme.txt

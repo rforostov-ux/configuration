@@ -1,0 +1,39 @@
+# Этап 4: команды ls, cd, tail, tac на VFS examples/vfs/deep.xml.
+# Запуск: run.bat --vfs examples/vfs/deep.xml --script examples/startup_commands.emu
+# Скрипт останавливается на первой ошибке, поэтому ошибка - в самом конце.
+# Остальные ошибки по одной показывают скрипты из examples/errors
+# (запуск всех сразу: scripts/test_commands).
+
+# 1. ls: текущий каталог, абсолютный и относительный путь, файл
+ls
+ls /home
+ls home/guest/docs
+ls /readme.txt
+
+# 2. cd: относительный и абсолютный путь, "." и "..", без аргумента
+cd home
+cd user
+ls
+cd ..
+cd ./guest/docs/drafts/old
+ls
+cd ../../..
+cd /home/user/../guest
+cd
+cd ..
+ls .
+
+# 3. tac: строки файла в обратном порядке (абсолютный и относительный путь)
+tac /home/user/notes.txt
+cd /home/user
+tac notes.txt
+
+# 4. tail: по умолчанию 10 строк, -n N, -n 0, N больше числа строк
+tail /home/guest/docs/todo.txt
+tail -n 3 /home/guest/docs/todo.txt
+tail -n 0 notes.txt
+tail -n 100 notes.txt
+
+# 5. Ошибка: tac для каталога. Скрипт остановится на этой строке.
+tac /home
+ls эта-строка-не-будет-выполнена

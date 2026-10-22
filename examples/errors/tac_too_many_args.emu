@@ -1,0 +1,3 @@
+# Ошибка: tac с двумя файлами. Запуск с --vfs examples/vfs/deep.xml.
+# Скрипт останавливается на строке с ошибкой.
+tac /readme.txt /home/user/notes.txt

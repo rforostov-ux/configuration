@@ -1,4 +1,7 @@
-"""Тесты оболочки: команды ls, cd, exit и обработка ошибок."""
+"""Тесты оболочки: разбор строки, exit и обработка ошибок.
+
+Команды работы с VFS (ls, cd, tail, tac) проверяет test_commands.py.
+"""
 
 import os
 import unittest
@@ -22,33 +25,28 @@ class ShellTests(unittest.TestCase):
         """Имя VFS сохраняется в оболочке."""
         self.assertEqual(self.shell.vfs_name, "test_vfs")
 
-    def test_ls_without_args(self):
-        """ls без аргументов сообщает, что аргументов нет."""
-        self.assertEqual(self.shell.execute("ls"),
-                         [Message("ls: заглушка, аргументов нет")])
+    def test_ls_in_empty_vfs(self):
+        """ls в пустой VFS ничего не выводит."""
+        self.assertEqual(self.shell.execute("ls"), [])
 
-    def test_ls_with_args_and_env(self):
-        """ls печатает аргументы после раскрытия переменных."""
-        self.assertEqual(self.shell.execute("ls -l $HOME"), [
-            Message("ls: заглушка, аргументов: 2"),
-            Message('  1) "-l"'),
-            Message('  2) "/home/user"'),
-        ])
+    def test_env_var_reaches_command(self):
+        """Переменная раскрывается до вызова команды: $HOME -> путь."""
+        self.assertEqual(self.shell.execute("ls $HOME"), [Message(
+            "ls: /home/user: нет такого файла или каталога", True)])
 
-    def test_ls_space_and_empty_args(self):
-        """Аргумент с пробелом и пустой аргумент видны в кавычках."""
-        self.assertEqual(self.shell.execute('ls "my dir" ""'), [
-            Message("ls: заглушка, аргументов: 2"),
-            Message('  1) "my dir"'),
-            Message('  2) ""'),
-        ])
+    def test_quoted_arg_with_space_is_one_arg(self):
+        """Аргумент в кавычках с пробелом передаётся целиком."""
+        self.assertEqual(self.shell.execute('ls "my dir"'), [Message(
+            "ls: my dir: нет такого файла или каталога", True)])
 
-    def test_cd_with_arg(self):
-        """cd печатает свой аргумент."""
-        self.assertEqual(self.shell.execute("cd /tmp"), [
-            Message("cd: заглушка, аргументов: 1"),
-            Message('  1) "/tmp"'),
-        ])
+    def test_cd_root(self):
+        """cd / в пустой VFS — без вывода, текущий каталог — корень."""
+        self.assertEqual(self.shell.execute("cd /"), [])
+        self.assertEqual(self.shell.cwd, "/")
+
+    def test_prompt_shows_cwd(self):
+        """Приглашение заканчивается текущим каталогом и '$ '."""
+        self.assertTrue(self.shell.prompt.endswith(":/$ "))
 
     def test_cd_too_many_args(self):
         """cd с двумя аргументами — ошибка."""

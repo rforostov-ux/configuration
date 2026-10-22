@@ -1,0 +1,4 @@
+# Ошибка: tail для двоичного файла. Запуск с --vfs examples/vfs/deep.xml.
+# Скрипт останавливается на строке с ошибкой.
+cd /home/user
+tail logo.png

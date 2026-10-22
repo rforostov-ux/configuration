@@ -173,3 +173,60 @@ def build_file(element, name, path):
     except (binascii.Error, ValueError) as error:
         raise VfsError(f"файл {path}: неверные данные base64") from error
     return VfsFile(name, data, binary=True)
+
+
+CURRENT_DIR = "."
+PARENT_DIR = ".."
+NOT_FOUND = "нет такого файла или каталога"
+NOT_A_DIR = "не каталог"
+
+
+class VfsPathError(Exception):
+    """Путь в VFS не найден или проходит через файл."""
+
+
+def is_dir(node):
+    """Проверяет, что узел — каталог."""
+    return isinstance(node, VfsDir)
+
+
+def path_from_names(names):
+    """Собирает абсолютный путь из списка имён: [] -> "/"."""
+    return ROOT_PATH + SEPARATOR.join(names)
+
+
+def step(root, stack, part):
+    """Делает один шаг по пути: stack — список пар (имя, узел)."""
+    current = stack[-1][1] if stack else root
+    if not is_dir(current):
+        raise VfsPathError(NOT_A_DIR)
+    if part == PARENT_DIR:
+        if stack:
+            stack.pop()
+    elif part != CURRENT_DIR:
+        node = current.children.get(part)
+        if node is None:
+            raise VfsPathError(NOT_FOUND)
+        stack.append((part, node))
+
+
+def resolve(vfs, cwd, path):
+    """Находит узел по пути относительно текущего каталога cwd.
+
+    Путь может быть абсолютным ("/home/user") или относительным
+    ("user/notes.txt"), "." — текущий каталог, ".." — родитель (выше
+    корня подняться нельзя). Возвращает пару (узел, абсолютный путь).
+    Бросает VfsPathError, если пути нет или он проходит через файл.
+    """
+    if not path:
+        raise VfsPathError(NOT_FOUND)
+    stack = []
+    if not path.startswith(SEPARATOR):
+        for part in cwd.split(SEPARATOR):
+            if part:
+                step(vfs.root, stack, part)
+    for part in path.split(SEPARATOR):
+        if part:
+            step(vfs.root, stack, part)
+    node = stack[-1][1] if stack else vfs.root
+    return node, path_from_names([name for name, _ in stack])

@@ -1,0 +1,4 @@
+# Ошибка: tac для каталога. Запуск с --vfs examples/vfs/deep.xml.
+# Скрипт останавливается на строке с ошибкой.
+tac /readme.txt
+tac /home
