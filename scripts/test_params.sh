@@ -5,7 +5,7 @@
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MAIN="$ROOT/src/main.py"
 EXAMPLES="$ROOT/examples"
-VFS="$EXAMPLES/demo_vfs.xml"
+VFS="$EXAMPLES/vfs/deep.xml"
 PYTHON="${PYTHON:-python3}"
 
 echo "=== 1. No parameters (defaults) ==="

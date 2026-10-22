@@ -6,7 +6,7 @@ rem The script stops at the first error, the window stays open.
 set "ROOT=%~dp0.."
 set "MAIN=%ROOT%\src\main.py"
 set "EXAMPLES=%ROOT%\examples"
-set "VFS=%EXAMPLES%\demo_vfs.xml"
+set "VFS=%EXAMPLES%\vfs\deep.xml"
 if not defined PYTHON set "PYTHON=python"
 
 echo === 1. --script with an unknown command (stops at line 4) ===

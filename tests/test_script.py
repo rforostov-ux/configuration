@@ -9,6 +9,7 @@ from config import Config
 from script import ScriptError, read_script, run_script
 from shell import Message, Shell
 from startup import build_startup
+from vfs import empty_vfs
 
 TEST_ENV = {"HOME": "/home/user"}
 
@@ -25,7 +26,7 @@ class ScriptTestCase(unittest.TestCase):
         """Создаёт временную папку и оболочку."""
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.shell = Shell("test_vfs")
+        self.shell = Shell(empty_vfs("test_vfs"))
 
     def write_script(self, content, encoding="utf-8"):
         """Записывает скрипт во временную папку и возвращает путь."""

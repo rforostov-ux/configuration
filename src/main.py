@@ -8,16 +8,17 @@ import sys
 import gui
 from config import parse_args
 from shell import Shell
-from startup import build_startup
+from startup import build_startup, open_vfs
 
 EXIT_OK = 0
 
 
 def main():
-    """Разбирает параметры, запускает окно, возвращает код выхода."""
+    """Разбирает параметры, загружает VFS, запускает окно."""
     config = parse_args(sys.argv[1:])
-    shell = Shell(config.vfs_name)
-    gui.run(shell, build_startup(config, shell))
+    vfs, vfs_messages = open_vfs(config)
+    shell = Shell(vfs)
+    gui.run(shell, build_startup(config, shell, vfs_messages))
     sys.exit(shell.exit_code or EXIT_OK)
 
 

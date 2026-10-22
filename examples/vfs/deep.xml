@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- VFS с вложенностью больше 3 уровней: 6 каталогов, 5 файлов.
+     Самый глубокий файл: /home/guest/docs/drafts/old/letter.txt -->
+<vfs>
+  <dir name="home">
+    <dir name="user">
+      <file name="notes.txt">первая строка
+вторая строка</file>
+      <file name="logo.png" encoding="base64">iVBORw0KGgo=</file>
+    </dir>
+    <dir name="guest">
+      <dir name="docs">
+        <file name="todo.txt">1. купить хлеб
+2. сдать практическую работу
+3. повторить git
+4. прочитать про VFS
+5. написать тесты
+6. обновить README
+7. сделать коммит
+8. отправить ветку
+9. показать преподавателю
+10. отдохнуть
+11. начать этап 4
+12. начать этап 5</file>
+        <dir name="drafts">
+          <dir name="old">
+            <file name="letter.txt">Черновик письма.</file>
+          </dir>
+        </dir>
+      </dir>
+    </dir>
+  </dir>
+  <file name="readme.txt">Привет из VFS</file>
+</vfs>

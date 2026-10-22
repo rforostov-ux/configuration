@@ -5,6 +5,7 @@ import unittest
 from unittest import mock
 
 from shell import Message, Shell, has_error
+from vfs import empty_vfs
 
 TEST_ENV = {"HOME": "/home/user", "USER": "user"}
 
@@ -15,7 +16,7 @@ class ShellTests(unittest.TestCase):
 
     def setUp(self):
         """Создаёт новую оболочку перед каждым тестом."""
-        self.shell = Shell("test_vfs")
+        self.shell = Shell(empty_vfs("test_vfs"))
 
     def test_vfs_name(self):
         """Имя VFS сохраняется в оболочке."""

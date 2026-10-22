@@ -5,7 +5,7 @@ rem Test 3: exit codes of the emulator process.
 set "ROOT=%~dp0.."
 set "MAIN=%ROOT%\src\main.py"
 set "EXAMPLES=%ROOT%\examples"
-set "VFS=%EXAMPLES%\demo_vfs.xml"
+set "VFS=%EXAMPLES%\vfs\deep.xml"
 if not defined PYTHON set "PYTHON=python"
 
 echo === 1. --vfs and --script ending with 'exit 3' (window closes itself) ===

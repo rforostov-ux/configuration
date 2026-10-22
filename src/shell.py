@@ -1,7 +1,8 @@
 """Логика оболочки: разбор строки и выполнение команд.
 
 Модуль ничего не знает про окно. Результат команды возвращается
-списком сообщений, а показывает их уже модуль gui.
+списком сообщений, а показывает их уже модуль gui. Оболочка работает
+с VFS, загруженной в память (модуль vfs).
 """
 
 import getpass
@@ -12,6 +13,7 @@ from cmd_parser import ParseError, parse
 
 MAX_CD_ARGS = 1
 MAX_EXIT_ARGS = 1
+MAX_VFS_INFO_ARGS = 0
 DEFAULT_EXIT_CODE = 0
 
 
@@ -45,16 +47,22 @@ def stub_output(name, args):
 class Shell:
     """Оболочка: хранит состояние и выполняет введённые строки."""
 
-    def __init__(self, vfs_name):
-        """Создаёт оболочку для виртуальной ФС с именем vfs_name."""
-        self.vfs_name = vfs_name
+    def __init__(self, vfs):
+        """Создаёт оболочку для загруженной VFS (объект vfs.Vfs)."""
+        self.vfs = vfs
         self.prompt = f"{getpass.getuser()}@{socket.gethostname()}:~$ "
         self.exit_code = None
         self.commands = {
             "ls": self.cmd_ls,
             "cd": self.cmd_cd,
             "exit": self.cmd_exit,
+            "vfs-info": self.cmd_vfs_info,
         }
+
+    @property
+    def vfs_name(self):
+        """Имя VFS для заголовка окна."""
+        return self.vfs.name
 
     def execute(self, line):
         """Выполняет строку и возвращает список сообщений для вывода."""
@@ -93,3 +101,15 @@ class Shell:
                 return [Message(text, True)]
         self.exit_code = code
         return []
+
+    def cmd_vfs_info(self, args):
+        """Служебная команда vfs-info: имя, источник и размер VFS."""
+        if len(args) > MAX_VFS_INFO_ARGS:
+            return [Message("vfs-info: команда не принимает аргументы",
+                            True)]
+        dirs, files = self.vfs.count()
+        return [
+            Message(f"VFS: {self.vfs.name}"),
+            Message(f"источник: {self.vfs.source_text}"),
+            Message(f"каталогов: {dirs}, файлов: {files}"),
+        ]

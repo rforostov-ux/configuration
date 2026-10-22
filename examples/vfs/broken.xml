@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Повреждённая VFS: тег <dir> из строки 6 не закрыт, парсер
+     обнаруживает ошибку на закрывающем теге </vfs> в строке 8 -->
+<vfs>
+  <file name="readme.txt">Привет из VFS</file>
+  <dir name="home">
+    <file name="notes.txt">текст</file>
+</vfs>

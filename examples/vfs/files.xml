@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Несколько файлов в корне: текстовые, пустой и двоичный (base64) -->
+<vfs>
+  <file name="readme.txt">Привет из VFS</file>
+  <file name="notes.txt">первая строка
+вторая строка
+третья строка</file>
+  <file name="empty.txt"/>
+  <!-- Картинка PNG 1x1 пиксель, двоичные данные в base64 -->
+  <file name="pixel.png" encoding="base64">
+    iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA
+    60e6kgAAAABJRU5ErkJggg==
+  </file>
+</vfs>
