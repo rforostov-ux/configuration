@@ -16,7 +16,7 @@
 
 import base64
 import binascii
-import xml.etree.ElementTree as ElementTree
+import xml.etree.ElementTree as element_tree
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Union
 
@@ -108,8 +108,8 @@ def read_xml(path):
     except OSError as error:
         raise VfsError(f"{path}: {error.strerror}") from error
     try:
-        return ElementTree.fromstring(data)
-    except ElementTree.ParseError as error:
+        return element_tree.fromstring(data)
+    except element_tree.ParseError as error:
         line = error.position[0]
         text = f"{path}: неверный формат XML (строка {line})"
         raise VfsError(text) from error
